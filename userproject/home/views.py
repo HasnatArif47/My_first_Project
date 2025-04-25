@@ -9,7 +9,7 @@ from .models import UserInfo
 
 
 
-
+    
 
 def index(request):
     if request.user.is_anonymous:
