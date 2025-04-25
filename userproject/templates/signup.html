@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Signup</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .signup-box {
+      background: white;
+      padding: 2.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .signup-box h2 {
+      margin-bottom: 1.5rem;
+      text-align: center;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .form-control {
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    label {
+      font-weight: 500;
+      margin-top: 0.5rem;
+    }
+
+    #role-selection {
+      margin-bottom: 1rem;
+    }
+
+    select {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid #ced4da;
+    }
+
+    .btn-primary {
+      background-color: #6c63ff;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background-color: #574b90;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="signup-box">
+    <h2>Signup</h2>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+
+      {% if request.path == "/adminpanel/signup/" %}
+        <div id="role-selection">
+          <label for="role">Select Role:</label>
+          <select name="role" id="role" class="form-control">
+            <option value="superuser">Superuser</option>
+            <option value="normal_user">Normal User</option>
+          </select>
+        </div>
+      {% endif %}
+
+      <button type="submit" class="btn btn-primary w-100">Sign up</button>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logged in User</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+
+        nav {
+            background-color: #0d6efd;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav .brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 1.5rem;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            color: #f39c12;
+        }
+
+        .content {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.7rem 1.5rem;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+            margin-top: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .demo-card-square.mdl-card {
+            width: 420px;
+            height: 420px;
+            float: left;
+            margin: 1rem;
+            position: relative;
+          }
+          
+          .demo-card-square.mdl-card:hover {
+            box-shadow: 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12), 0 5px 5px -3px rgba(0, 0, 0, .2);
+          }
+          
+          .demo-card-square > .mdl-card__title {
+            color: #fff;
+            background: #03a9f4;
+          }
+          
+          .demo-card-square > .mdl-card__accent {
+            background: #ff9800;
+          }
+          
+          body {
+            padding: 20px;
+            background: #fafafa;
+            position: relative;
+          }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="brand">MyWebsite</div>
+        <div>
+            <a href="/dashboard">Dashboard</a>
+            <a href="{{ request.path }}signup">Sign up</a>
+            <a href="{% url 'logout' %}">Logout</a>
+
+
+        </div>
+    </nav>
+
+    <html>
+
+<head>
+  <!-- Material Design Lite -->
+  <script src="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.min.js"></script>
+  <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.blue-orange.min.css">
+  <!-- Material Design icon font -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+
+<body>
+    {% for user in user_data %}
+    <div class="mdl-card mdl-shadow--2dp demo-card-square">
+      <div class="mdl-card__title mdl-card--expand">
+        <h2 class="mdl-card__title-text">{{ user.name }}</h2>
+      </div>
+      <div class="mdl-color-text--grey-700 mdl-card__supporting-text">
+        Email: {{ user.email }}<br>
+        Phone: {{ user.phone_number }}<br>  <!-- use correct field name -->
+    </div>
+    <div class="mdl-card__supporting-text">
+        Address: {{ user.address }}<br>
+        Message: {{ user.message }}<br> <!-- show message -->
+    </div>
+
+      <div class="mdl-card__actions mdl-card--border">
+        <a class="mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect">
+          Edit
+        </a>
+        <a class="mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect">
+          Remove
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+    
+</body>
+
+</html>
+</body>
+</html>

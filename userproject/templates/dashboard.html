@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+    }
+
+    nav {
+      background-color: #0d6efd;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: margin-left 0.3s ease;
+    }
+
+    nav.shift { margin-left: 250px; }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-left .menu-icon {
+      font-size: 1.5rem;
+      cursor: pointer;
+      margin-right: 1rem;
+    }
+
+    nav .logo { font-size: 1.5rem; font-weight: bold; }
+
+    nav .nav-links {
+      display: flex;
+      gap: 1rem;
+    }
+
+    nav .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    nav .nav-links a:hover { color: #f39c12; }
+
+    .sidebar {
+      height: 100vh;
+      width: 250px;
+      position: fixed;
+      top: 0;
+      left: -250px;
+      background-color: #0d6efd;
+      transition: left 0.3s ease;
+      padding-top: 2rem;
+      overflow-y: auto;
+      z-index: 999;
+    }
+
+    .sidebar.open { left: 0; }
+
+    .sidebar a {
+      display: block;
+      padding: 1rem 2rem;
+      color: white;
+      text-decoration: none;
+      border-bottom: 1px solid #2c3e50;
+    }
+
+    .sidebar a:hover { background-color: #2c3e50; }
+
+    .content {
+      margin-left: 0;
+      padding: 2rem;
+      transition: margin-left 0.3s ease;
+    }
+
+    .content.shift { margin-left: 250px; }
+
+    .popup-form {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 2rem;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      width: 350px;
+      border-radius: 10px;
+      font-family: Arial, sans-serif;
+    }
+
+    .popup-form.active { display: block; }
+
+    .popup-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+
+    .popup-overlay.active { display: block; }
+
+    .popup-form input {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.6rem 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .popup-form input:focus { border-color: #3498db; }
+
+    .popup-form button {
+      width: 100%;
+      padding: 0.8rem;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .popup-form button:hover { background-color: #2980b9; }
+
+    .popup-form .close-btn {
+      background: none;
+      border: none;
+      color: #3498db;
+      font-size: 1.2rem;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .popup-form .close-btn:hover { color: #2980b9; }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav id="navbar">
+    <div class="nav-left">
+      <span class="menu-icon" onclick="toggleSidebar()">☰</span>
+      <div class="logo">Admin DashBoard</div>
+    </div>
+    <div class="nav-links">
+      <a href="#" onclick="togglePopup()">Open Form</a>
+    </div>
+  </nav>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+    <a href="/contact">Contact</a>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/login">Logout</a>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content" id="mainContent">
+    <h2>Welcome {{ request.user }}</h2>
+    <p>This is the dashboard. Use the sidebar and navbar to navigate.</p>
+  </div>
+
+  <!-- Popup Form -->
+  <div class="popup-overlay" id="popupOverlay" onclick="togglePopup()"></div>
+  <div class="popup-form" id="popupForm">
+    <h3>User Info</h3>
+    <form method="POST" action="{% url 'save_user_info' %}">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Submit</button>
+      <button type="button" class="close-btn" onclick="togglePopup()">Close</button>
+    </form>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const navbar = document.getElementById('navbar');
+      const mainContent = document.getElementById('mainContent');
+      sidebar.classList.toggle('open');
+      mainContent.classList.toggle('shift');
+      navbar.classList.toggle('shift');
+    }
+
+    document.addEventListener('click', function(event) {
+      const sidebar = document.getElementById('sidebar');
+      const menuIcon = document.querySelector('.menu-icon');
+      const mainContent = document.getElementById('mainContent');
+      const navbar = document.getElementById('navbar');
+      if (!sidebar.contains(event.target) && !menuIcon.contains(event.target)) {
+        sidebar.classList.remove('open');
+        mainContent.classList.remove('shift');
+        navbar.classList.remove('shift');
+      }
+    });
+
+    function togglePopup() {
+      const popupForm = document.getElementById('popupForm');
+      const popupOverlay = document.getElementById('popupOverlay');
+      popupForm.classList.toggle('active');
+      popupOverlay.classList.toggle('active');
+    }
+  </script>
+
+</body>
+</html>
