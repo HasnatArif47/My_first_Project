@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logged in User</title>
     <style>
+        /* General body styling */
         body {
             margin: 0;
             font-family: Arial, sans-serif;
             background-color: #f2f2f2;
+            padding: 20px;
         }
 
         nav {
@@ -41,50 +44,156 @@
             text-align: center;
         }
 
-        .btn {
+        /* Card container */
+        .mdl-card {
+            width: 420px;
+            height: 420px;
+            margin: 1rem;
+            position: relative;
             display: inline-block;
-            padding: 0.7rem 1.5rem;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            text-decoration: none;
+            vertical-align: top;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .mdl-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .mdl-card__title {
+            background-color: #03a9f4;
+            color: #fff;
+            padding: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
+        }
+
+        .mdl-card__supporting-text {
+            padding: 20px;
+            color: #555;
             font-size: 1rem;
-            margin-top: 1rem;
+            line-height: 1.5;
+        }
+
+        .mdl-card__actions {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f9f9f9;
+            border-radius: 0 0 8px 8px;
+        }
+
+        /* Button styling */
+        .mdl-button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
             transition: background-color 0.3s;
         }
 
-        .btn:hover {
+        .mdl-button:hover {
             background-color: #2980b9;
         }
-        .demo-card-square.mdl-card {
-            width: 420px;
-            height: 420px;
-            float: left;
-            margin: 1rem;
-            position: relative;
-          }
-          
-          .demo-card-square.mdl-card:hover {
-            box-shadow: 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12), 0 5px 5px -3px rgba(0, 0, 0, .2);
-          }
-          
-          .demo-card-square > .mdl-card__title {
-            color: #fff;
-            background: #03a9f4;
-          }
-          
-          .demo-card-square > .mdl-card__accent {
-            background: #ff9800;
-          }
-          
-          body {
-            padding: 20px;
-            background: #fafafa;
-            position: relative;
-          }
+
+        .mdl-button--accent {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .mdl-button--accent:hover {
+            background-color: #3498db;
+        }
+
+        /* Form styling */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            display: none;
+        }
+
+        .popup-form {
+            position: fixed;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            z-index: 101;
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .form-actions .btn {
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        /* Media Query for mobile devices */
+        @media (max-width: 768px) {
+            .mdl-card {
+                width: 100%;
+                margin: 1rem 0;
+            }
+
+            .popup-form {
+                width: 90%;
+            }
+        }
+
     </style>
 </head>
+
 <body>
 
     <nav>
@@ -93,49 +202,107 @@
             <a href="/dashboard">Dashboard</a>
             <a href="{{ request.path }}signup">Sign up</a>
             <a href="{% url 'logout' %}">Logout</a>
-
-
         </div>
     </nav>
 
-    <html>
+    <div class="content">
+        {% for user in user_data %}
+        <div class="mdl-card mdl-shadow--2dp">
+            <div class="mdl-card__title">
+                <h2>{{ user.name }}</h2>
+            </div>
+            <div class="mdl-card__supporting-text">
+                Email: {{ user.email }}<br>
+                Phone: {{ user.phone_number }}<br>
+            </div>
+            <div class="mdl-card__supporting-text">
+                Address: {{ user.address }}<br>
+                Message: {{ user.message }}<br>
+            </div>
 
-<head>
-  <!-- Material Design Lite -->
-  <script src="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.min.js"></script>
-  <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.blue-orange.min.css">
-  <!-- Material Design icon font -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-</head>
+            <div class="mdl-card__actions">
+                <!-- Edit Button -->
+                <a href="#" class="mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect"
+                    onclick="openPopupWithData({
+                        id: {{ user.id }},
+                        name: '{{ user.name|escapejs }}',
+                        email: '{{ user.email|escapejs }}',
+                        phone_number: '{{ user.phone_number|escapejs }}',
+                        address: '{{ user.address|escapejs }}',
+                        message: '{{ user.message|escapejs }}'
+                    })">Edit</a>
 
-<body>
-    {% for user in user_data %}
-    <div class="mdl-card mdl-shadow--2dp demo-card-square">
-      <div class="mdl-card__title mdl-card--expand">
-        <h2 class="mdl-card__title-text">{{ user.name }}</h2>
-      </div>
-      <div class="mdl-color-text--grey-700 mdl-card__supporting-text">
-        Email: {{ user.email }}<br>
-        Phone: {{ user.phone_number }}<br>  <!-- use correct field name -->
-    </div>
-    <div class="mdl-card__supporting-text">
-        Address: {{ user.address }}<br>
-        Message: {{ user.message }}<br> <!-- show message -->
+                <!-- Remove Button inside Form -->
+                <form method="POST" action="{% url 'save_user_info' %}" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                    <input type="hidden" name="action" value="delete">
+                    <button type="submit" class="mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect"
+                        onclick="return confirm('Are you sure you want to delete this record?');">
+                        Remove
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
     </div>
 
-      <div class="mdl-card__actions mdl-card--border">
-        <a class="mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect">
-          Edit
-        </a>
-        <a class="mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect">
-          Remove
-        </a>
-      </div>
+    <!-- Popup Form for editing -->
+    <div class="popup-overlay" id="popupOverlay" onclick="closePopup()"></div>
+
+    <div class="popup-form" id="popupForm" style="display: none;">
+        <h3>Edit User Info</h3>
+        <form method="POST" action="{% url 'save_user_info' %}">
+            {% csrf_token %}
+            <input type="hidden" name="user_id" id="user_id"> <!-- To know which user you're updating -->
+
+            <div class="form-group">
+                <label for="id_name">Name</label>
+                <input type="text" id="id_name" name="name" placeholder="Enter full name" required>
+            </div>
+            <div class="form-group">
+                <label for="id_email">Email</label>
+                <input type="email" id="id_email" name="email" placeholder="Enter email" required>
+            </div>
+            <div class="form-group">
+                <label for="id_phone">Phone Number</label>
+                <input type="text" id="id_phone" name="phone_number" placeholder="Enter phone number" required>
+            </div>
+            <div class="form-group">
+                <label for="id_address">Address</label>
+                <input type="text" id="id_address" name="address" placeholder="Enter address" required>
+            </div>
+            <div class="form-group">
+                <label for="id_message">Message</label>
+                <textarea id="id_message" name="message" placeholder="Enter message" rows="4" required></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-secondary" onclick="closePopup()">Close</button>
+            </div>
+        </form>
     </div>
-    {% endfor %}
-    
+
+    <script>
+        function openPopupWithData(user) {
+            document.getElementById('user_id').value = user.id;
+            document.getElementById('id_name').value = user.name;
+            document.getElementById('id_email').value = user.email;
+            document.getElementById('id_phone').value = user.phone_number;
+            document.getElementById('id_address').value = user.address;
+            document.getElementById('id_message').value = user.message;
+
+            document.getElementById('popupForm').style.display = 'block';
+            document.getElementById('popupOverlay').style.display = 'block';
+        }
+
+        function closePopup() {
+            document.getElementById('popupForm').style.display = 'none';
+            document.getElementById('popupOverlay').style.display = 'none';
+        }
+    </script>
+
 </body>
 
-</html>
-</body>
 </html>

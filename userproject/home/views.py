@@ -1,5 +1,5 @@
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect ,get_object_or_404
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from .forms import SuperUserSignUpForm
 from django.contrib.auth import login
@@ -92,19 +92,47 @@ def signupuser(request):
 
 from django.contrib import messages  # Add this if not already there
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import UserInfoForm
+
 def save_user_info(request):
     if request.method == 'POST':
-        form = UserInfoForm(request.POST)
+        user_id = request.POST.get('user_id')
+        action = request.POST.get('action')  # Check which button was clicked
+
+        # Safely get the UserInfo object
+        if user_id:
+            user_info = get_object_or_404(UserInfo, id=user_id)
+        else:
+            user_info = None
+
+        if action == 'delete' and user_info:
+            # If action is delete, delete the user_info from DB
+            print("delete", action)
+            user_info.delete()
+            messages.success(request, "User information deleted.")
+            return redirect('/adminpanel')
+
+        if user_id:
+            # If user_info exists (update mode)
+            form = UserInfoForm(request.POST, instance=user_info)
+        else:
+            # If user_info does not exist (create mode), assuming you want to create a new UserInfo object
+            form = UserInfoForm(request.POST)
+
+        # Process the form (save or show error)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Your form has been submitted!')
-            return redirect('/dashboard')  # Redirect to dashboard
+            if user_info:
+                messages.success(request, "User information updated.")
+            else:
+                messages.success(request, "New user information created.")
         else:
-            messages.error(request, 'Please correct the errors below.')
-    else:
-        form = UserInfoForm()
+            messages.error(request, "There was an error processing the form.")
 
-    return render(request, 'dashboard.html', {'form': form})
+    return redirect('/adminpanel')
+
 
 
 def dashboard(request):
