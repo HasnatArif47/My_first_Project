@@ -12,6 +12,6 @@ class SuperUserSignUpForm(UserCreationForm):
 class UserInfoForm(forms.ModelForm):
     class Meta:
         model = UserInfo
-        fields = ['name', 'email', 'phone_number', 'address']
+        fields = ['name', 'email', 'phone_number', 'address', 'image_base64',]  # Include the image field here
 
         

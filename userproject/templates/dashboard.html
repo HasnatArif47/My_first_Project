@@ -157,7 +157,7 @@
   <nav id="navbar">
     <div class="nav-left">
       <span class="menu-icon" onclick="toggleSidebar()">☰</span>
-      <div class="logo">Admin DashBoard</div>
+      <div class="logo">Admin Dashboard</div>
     </div>
     <div class="nav-links">
       <a href="#" onclick="togglePopup()">Open Form</a>
@@ -179,13 +179,30 @@
     <p>This is the dashboard. Use the sidebar and navbar to navigate.</p>
   </div>
 
-  <!-- Popup Form -->
+  <!-- Popup Overlay -->
   <div class="popup-overlay" id="popupOverlay" onclick="togglePopup()"></div>
+
+  <!-- Popup Form -->
   <div class="popup-form" id="popupForm">
     <h3>User Info</h3>
     <form method="POST" action="{% url 'save_user_info' %}">
       {% csrf_token %}
-      {{ form.as_p }}
+      <label for="name">Name</label>
+      <input type="text" name="name" id="name" required>
+
+      <label for="email">Email</label>
+      <input type="email" name="email" id="email" required>
+
+      <label for="phone">Phone Number</label>
+      <input type="text" name="phone_number" id="phone_number" required>
+
+      <label for="address">Address</label>
+      <input type="text" name="address" id="address" required>
+
+      <label for="image">Upload Image</label>
+      <input type="file" name="image" id="image" accept="image/*" onchange="encodeImageFileAsURL()">
+      <img id="imagePreview" style="display:none; max-width: 200px; margin-top: 10px;" />
+
       <button type="submit">Submit</button>
       <button type="button" class="close-btn" onclick="togglePopup()">Close</button>
     </form>
@@ -218,6 +235,28 @@
       const popupOverlay = document.getElementById('popupOverlay');
       popupForm.classList.toggle('active');
       popupOverlay.classList.toggle('active');
+    }
+
+    function encodeImageFileAsURL() {
+      var file = document.getElementById('image').files[0];
+      var reader = new FileReader();
+
+      reader.onloadend = function () {
+        var base64String = reader.result.split(',')[1];  // Get base64 string
+        document.getElementById('imagePreview').style.display = 'block';
+        document.getElementById('imagePreview').src = reader.result;
+
+        // Create hidden input to store base64 data
+        var hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'image_base64';
+        hiddenInput.value = base64String;
+        document.forms[0].appendChild(hiddenInput);
+      }
+
+      if (file) {
+        reader.readAsDataURL(file); // Read the file as base64
+      }
     }
   </script>
 

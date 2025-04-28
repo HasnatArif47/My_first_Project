@@ -1,12 +1,12 @@
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect ,get_object_or_404
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from .forms import SuperUserSignUpForm
 from django.contrib.auth import login
 from .forms import UserInfoForm
 from django.contrib import messages
 from .models import UserInfo
-
+import base64
 
 
 
@@ -92,19 +92,55 @@ def signupuser(request):
 
 from django.contrib import messages  # Add this if not already there
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import UserInfoForm
+
 def save_user_info(request):
     if request.method == 'POST':
-        form = UserInfoForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Your form has been submitted!')
-            return redirect('/dashboard')  # Redirect to dashboard
-        else:
-            messages.error(request, 'Please correct the errors below.')
-    else:
-        form = UserInfoForm()
+        user_id = request.POST.get('user_id')
+        action = request.POST.get('action')
 
-    return render(request, 'dashboard.html', {'form': form})
+        user_info = get_object_or_404(UserInfo, id=user_id) if user_id else None
+
+        # Handle delete
+        if action == 'delete' and user_info:
+            user_info.delete()
+            messages.success(request, "User information deleted.")
+            return redirect('/adminpanel')
+
+        # Create or update form
+        form = UserInfoForm(request.POST, request.FILES, instance=user_info)
+
+        if form.is_valid():
+            image_file = request.FILES.get('image_base64')
+            print("Image file:", image_file)  # Debugging line
+            if image_file:
+                # Convert and save new image
+                file_content = image_file.read()
+                base64_string = base64.b64encode(file_content).decode()
+                form.instance.image_base64 = base64_string
+                print("New image uploaded and saved.")
+            elif user_info:
+                # Keep existing image if no new image uploaded
+                form.instance.image_base64 = user_info.image_base64
+                print("No new image uploaded. Keeping the old one.")
+
+            form.save()
+
+            if user_info:
+                messages.success(request, "User information updated.")
+            else:
+                messages.success(request, "New user information created.")
+        else:
+            messages.error(request, "There was an error processing the form.")
+            print(form.errors)
+
+    return redirect('/adminpanel')
+def admin_panel(request):
+    # Retrieve all user information (if you want to display them on the admin panel)
+    user_info_list = UserInfo.objects.all()
+    return render(request, 'adminpanel.html', {'user_info_list': user_info_list})
 
 
 def dashboard(request):

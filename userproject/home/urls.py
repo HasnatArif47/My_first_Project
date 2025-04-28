@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.urls import path,include
 from home import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 urlpatterns = [
@@ -14,5 +16,6 @@ urlpatterns = [
     path('contact/', views.contact, name='contact'),
     path('dashboard/', views.dashboard, name='dashboard'), 
     path('save_user_info/', views.save_user_info, name='save_user_info'),
-    path('success/', views.success, name='success'),   
+    path('success/', views.success, name='success'), 
+    path('save_user_info/', views.save_user_info, name='save_user_info'),  
     ]
