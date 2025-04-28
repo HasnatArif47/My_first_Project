@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logged in User</title>
+    <title>Admin Panel</title>
     <style>
         /* General body styling */
         body {
@@ -123,19 +123,21 @@
             display: none;
         }
 
-        .popup-form {
-            position: fixed;
-            top: 10%;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-            width: 400px;
-            z-index: 101;
-            display: none;
-        }
+       .popup-form {
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    max-height: 80vh;
+    z-index: 101;
+    display: none;
+    overflow-y: auto;
+}
 
         .form-group {
             margin-bottom: 1rem;
@@ -190,7 +192,6 @@
                 width: 90%;
             }
         }
-
     </style>
 </head>
 
@@ -206,13 +207,20 @@
     </nav>
 
     <div class="content">
+        {% load static %}
         {% for user in user_data %}
         <div class="mdl-card mdl-shadow--2dp">
-            <div class="mdl-card__title">
+ <div class="mdl-card__title">
+                <!-- Displaying user image before the name -->
+                {% if user.image_base64 %}
+                <img src="data:image/jpeg;base64,{{ user.image_base64 }}" alt="User Image" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;">    
+                {% else %}
+                <img src="path/to/default/image.jpg" alt="Default Image" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;">
+                {% endif %}
                 <h2>{{ user.name }}</h2>
             </div>
-            <div class="mdl-card__supporting-text">
-                Email: {{ user.email }}<br>
+            <div class="mdl-card__supporting-text"> bn   
+                <br>Email: {{ user.email }}<br>
                 Phone: {{ user.phone_number }}<br>
             </div>
             <div class="mdl-card__supporting-text">
@@ -221,7 +229,6 @@
             </div>
 
             <div class="mdl-card__actions">
-                <!-- Edit Button -->
                 <a href="#" class="mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect"
                     onclick="openPopupWithData({
                         id: {{ user.id }},
@@ -229,10 +236,10 @@
                         email: '{{ user.email|escapejs }}',
                         phone_number: '{{ user.phone_number|escapejs }}',
                         address: '{{ user.address|escapejs }}',
-                        message: '{{ user.message|escapejs }}'
+                        message: '{{ user.message|escapejs }}',
+                        image: '{{ user.image_base64|escapejs }}'
                     })">Edit</a>
 
-                <!-- Remove Button inside Form -->
                 <form method="POST" action="{% url 'save_user_info' %}" style="display:inline;">
                     {% csrf_token %}
                     <input type="hidden" name="user_id" value="{{ user.id }}">
@@ -252,7 +259,7 @@
 
     <div class="popup-form" id="popupForm" style="display: none;">
         <h3>Edit User Info</h3>
-        <form method="POST" action="{% url 'save_user_info' %}">
+        <form method="POST" action="{% url 'save_user_info' %}" enctype="multipart/form-data">
             {% csrf_token %}
             <input type="hidden" name="user_id" id="user_id"> <!-- To know which user you're updating -->
 
@@ -277,30 +284,65 @@
                 <textarea id="id_message" name="message" placeholder="Enter message" rows="4" required></textarea>
             </div>
 
+            <!-- Add file input for image upload -->
+            <div class="form-group">
+                <label for="image">Upload Image</label>
+                <input type="file" name="image_base64" id="image_base64" accept="image/*" onchange="encodeImageFileAsURL()">
+                <img id="imagePreview" style="display:none; max-width: 200px; margin-top: 10px;" />
+            </div>
+
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Save</button>
+                
+                <button type="submit" class="btn btn-primary">Edit</button>
                 <button type="button" class="btn btn-secondary" onclick="closePopup()">Close</button>
             </div>
         </form>
     </div>
 
     <script>
-        function openPopupWithData(user) {
-            document.getElementById('user_id').value = user.id;
-            document.getElementById('id_name').value = user.name;
-            document.getElementById('id_email').value = user.email;
-            document.getElementById('id_phone').value = user.phone_number;
-            document.getElementById('id_address').value = user.address;
-            document.getElementById('id_message').value = user.message;
-
-            document.getElementById('popupForm').style.display = 'block';
-            document.getElementById('popupOverlay').style.display = 'block';
+        function openPopupWithData(data) {
+            document.getElementById("user_id").value = data.id;
+            document.getElementById("id_name").value = data.name;
+            document.getElementById("id_email").value = data.email;
+            document.getElementById("id_phone").value = data.phone_number;
+            document.getElementById("id_address").value = data.address;
+            document.getElementById("id_message").value = data.message;
+        
+            // Set preview image
+            if (data.image_base64) {
+                const imgPreview = document.getElementById("imagePreview");
+                imgPreview.src = "data:image/jpeg;base64," + data.image;
+                imgPreview.style.display = "block";
+            }
+        
+            document.getElementById("popupOverlay").style.display = "block";
+            document.getElementById("popupForm").style.display = "block";
         }
-
-        function closePopup() {
-            document.getElementById('popupForm').style.display = 'none';
-            document.getElementById('popupOverlay').style.display = 'none';
+        
+        function encodeImageFileAsURL() {
+            const fileInput = document.getElementById("image");
+            const imgPreview = document.getElementById("imagePreview");
+            
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onloadend = function () {
+                    imgPreview.src = reader.result;
+                    imgPreview.style.display = "block";
+                    
+                    // Save the base64 image data in a hidden input field
+                    const base64Image = reader.result.split(',')[1];  // Extract base64 data without prefix
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'image_base64';
+                    hiddenInput.value = base64Image;
+                    document.forms[0].appendChild(hiddenInput);
+                }
+                reader.readAsDataURL(file);
+            }
         }
+        
+        
     </script>
 
 </body>
